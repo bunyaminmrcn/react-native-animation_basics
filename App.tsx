@@ -25,6 +25,24 @@ import {
 
 
 
+// how is the animation actually played on the screen?
+// 1. Computation = JS Thread; Animation by Native OS 
+// 1a. Compute
+// 1b. Serialize
+// 1c. Transfer it over the bridge to host OS
+// 1d. Deserialize
+// 1e. Run the frame
+
+// 2. Everything by Native OS
+// 2a. Before your animation starts - serialize the whole animation thing
+// 2b. Native OS deserialize the it
+// 2c. Win!
+
+// 1. No more over the bridge transfer
+// 2. JS thread is now free for aother stuff
+// 3. Smoother animations
+
+
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -37,10 +55,10 @@ function App(): JSX.Element {
   const leftValue = useState(new Animated.Value(0))[0];
 
   const moveBall = () => {
-    Animated.spring(leftValue, {
-      toValue: 300,
-      //duration: 1000,
-      useNativeDriver: false
+    Animated.timing(leftValue, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true
     }).start();
   }
   return (
@@ -52,7 +70,7 @@ function App(): JSX.Element {
               borderRadius: 50,
               width: 100,
               height: 100,
-              marginLeft: leftValue
+              opacity: leftValue
           }}></Animated.View>
           <TouchableOpacity onPress={moveBall}><Text>Click ME.</Text></TouchableOpacity>
         </View>
