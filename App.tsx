@@ -56,7 +56,7 @@ function App(): JSX.Element {
 
   const moveBall = () => {
     Animated.timing(leftValue, {
-      toValue: 1,
+      toValue: 500,
       duration: 1000,
       useNativeDriver: true
     }).start();
@@ -70,7 +70,7 @@ function App(): JSX.Element {
               borderRadius: 50,
               width: 100,
               height: 100,
-              opacity: leftValue
+              transform: [{translateX: leftValue}]
           }}></Animated.View>
           <TouchableOpacity onPress={moveBall}><Text>Click ME.</Text></TouchableOpacity>
         </View>
