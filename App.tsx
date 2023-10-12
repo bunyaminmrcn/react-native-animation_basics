@@ -17,6 +17,7 @@ import {
   Text,
   useColorScheme,
   View,
+  PanResponder,
 } from 'react-native';
 
 import {
@@ -47,47 +48,40 @@ import {
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  const pan = useState(new Animated.ValueXY())[0]
+  const panResponder = useState(PanResponder.create({
 
-
-  const opacity = useState(new Animated.Value(0))[0];
-
-  const fadeInBall = () => {
-    Animated.timing(opacity, {
-      toValue: 1,
-      duration: 1000,
-      useNativeDriver: true
-    }).start()
-  }
-
-  const fadeOutBall = () => {
-    Animated.timing(opacity, {
-      toValue: 0,
-      duration: 1000,
-      useNativeDriver: true
-    }).start()
-
-  }
+    onMoveShouldSetPanResponder: () => true,
+    onPanResponderGrant: () => {
+      console.log('GRANT!')
+      pan.setOffset({
+        x: pan.x._value,
+        y: pan.y._value
+      })
+    }, onPanResponderMove: (_, gesture) => {
+      pan.x.setValue(gesture.dx)
+      pan.y.setValue(gesture.dy)
+    }, onPanResponderRelease: () => {
+      pan.flattenOffset();
+    }
+  }))[0]
 
   return (
-      <View style={{ flex: 1 }}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 
-          <Animated.View style={{
-              backgroundColor: 'red', 
-              borderRadius: 50,
-              width: 100,
-              height: 100,
-              opacity: opacity,
-              //transform: [{translateX: leftValue}]
-          }}></Animated.View>
-          <TouchableOpacity onPress={fadeInBall}><Text>Fade in.</Text></TouchableOpacity>
-          <TouchableOpacity onPress={fadeOutBall}><Text>Fade out.</Text></TouchableOpacity>
+        <Animated.View style={[{
+          backgroundColor: 'red',
+          borderRadius: 50,
+          width: 100,
+          height: 100,
 
-        </View>
+          //transform: [{translateX: leftValue}]
+        }, pan.getLayout()]}
+        {...panResponder.panHandlers}></Animated.View>
+
       </View>
+    </View>
   );
 }
 
