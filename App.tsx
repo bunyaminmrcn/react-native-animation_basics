@@ -17,6 +17,7 @@ import {
   Text,
   useColorScheme,
   View,
+  PanResponder,
 } from 'react-native';
 
 import {
@@ -25,38 +26,62 @@ import {
 
 
 
+// how is the animation actually played on the screen?
+// 1. Computation = JS Thread; Animation by Native OS 
+// 1a. Compute
+// 1b. Serialize
+// 1c. Transfer it over the bridge to host OS
+// 1d. Deserialize
+// 1e. Run the frame
+
+// 2. Everything by Native OS
+// 2a. Before your animation starts - serialize the whole animation thing
+// 2b. Native OS deserialize the it
+// 2c. Win!
+
+// 1. No more over the bridge transfer
+// 2. JS thread is now free for aother stuff
+// 3. Smoother animations
+
+
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+  const pan = useState(new Animated.ValueXY())[0]
+  const panResponder = useState(PanResponder.create({
 
+    onMoveShouldSetPanResponder: () => true,
+    onPanResponderGrant: () => {
+      console.log('GRANT!')
+      pan.setOffset({
+        x: pan.x._value,
+        y: pan.y._value
+      })
+    }, onPanResponderMove: (_, gesture) => {
+      pan.x.setValue(gesture.dx)
+      pan.y.setValue(gesture.dy)
+    }, onPanResponderRelease: () => {
+      pan.flattenOffset();
+    }
+  }))[0]
 
-  const leftValue = useState(new Animated.Value(0))[0];
-
-  const moveBall = () => {
-    Animated.timing(leftValue, {
-      toValue: 100,
-      duration: 1000,
-      useNativeDriver: false
-    }).start();
-  }
   return (
-      <View style={{ flex: 1 }}>
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+    <View style={{ flex: 1 }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
 
-          <Animated.View style={{
-              backgroundColor: 'red', 
-              borderRadius: 50,
-              width: 100,
-              height: 100,
-              marginLeft: leftValue
-          }}></Animated.View>
-          <TouchableOpacity onPress={moveBall}><Text>Click ME.</Text></TouchableOpacity>
-        </View>
+        <Animated.View style={[{
+          backgroundColor: 'red',
+          borderRadius: 50,
+          width: 100,
+          height: 100,
+
+          //transform: [{translateX: leftValue}]
+        }, pan.getLayout()]}
+        {...panResponder.panHandlers}></Animated.View>
+
       </View>
+    </View>
   );
 }
 
