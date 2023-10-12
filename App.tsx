@@ -37,9 +37,9 @@ function App(): JSX.Element {
   const leftValue = useState(new Animated.Value(0))[0];
 
   const moveBall = () => {
-    Animated.timing(leftValue, {
-      toValue: 100,
-      duration: 1000,
+    Animated.spring(leftValue, {
+      toValue: 300,
+      //duration: 1000,
       useNativeDriver: false
     }).start();
   }
