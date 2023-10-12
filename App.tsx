@@ -5,9 +5,11 @@
  * @format
  */
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
+import React, { useState } from 'react';
+import type { PropsWithChildren } from 'react';
 import {
+  Animated,
+  TouchableOpacity,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -31,14 +33,30 @@ function App(): JSX.Element {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
 
+
+  const leftValue = useState(new Animated.Value(0))[0];
+
+  const moveBall = () => {
+    Animated.timing(leftValue, {
+      toValue: 100,
+      duration: 1000,
+      useNativeDriver: false
+    }).start();
+  }
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      
-    </SafeAreaView>
+      <View style={{ flex: 1 }}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+
+          <Animated.View style={{
+              backgroundColor: 'red', 
+              borderRadius: 50,
+              width: 100,
+              height: 100,
+              marginLeft: leftValue
+          }}></Animated.View>
+          <TouchableOpacity onPress={moveBall}><Text>Click ME.</Text></TouchableOpacity>
+        </View>
+      </View>
   );
 }
 
