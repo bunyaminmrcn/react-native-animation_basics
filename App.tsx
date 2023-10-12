@@ -52,15 +52,25 @@ function App(): JSX.Element {
   };
 
 
-  const leftValue = useState(new Animated.Value(0))[0];
+  const opacity = useState(new Animated.Value(0))[0];
 
-  const moveBall = () => {
-    Animated.timing(leftValue, {
-      toValue: 500,
+  const fadeInBall = () => {
+    Animated.timing(opacity, {
+      toValue: 1,
       duration: 1000,
       useNativeDriver: true
-    }).start();
+    }).start()
   }
+
+  const fadeOutBall = () => {
+    Animated.timing(opacity, {
+      toValue: 0,
+      duration: 1000,
+      useNativeDriver: true
+    }).start()
+
+  }
+
   return (
       <View style={{ flex: 1 }}>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -70,9 +80,12 @@ function App(): JSX.Element {
               borderRadius: 50,
               width: 100,
               height: 100,
-              transform: [{translateX: leftValue}]
+              opacity: opacity,
+              //transform: [{translateX: leftValue}]
           }}></Animated.View>
-          <TouchableOpacity onPress={moveBall}><Text>Click ME.</Text></TouchableOpacity>
+          <TouchableOpacity onPress={fadeInBall}><Text>Fade in.</Text></TouchableOpacity>
+          <TouchableOpacity onPress={fadeOutBall}><Text>Fade out.</Text></TouchableOpacity>
+
         </View>
       </View>
   );
